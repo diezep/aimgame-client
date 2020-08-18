@@ -12,10 +12,13 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 // import 'package:flutter_socket_io/flutter_socket_io.dart';
+import 'dart:io';
 
 class RoomProvider with ChangeNotifier {
   // Keep room
   static final RoomProvider _instancia = RoomProvider._internal();
+  IO.Socket _socket;
+
   factory RoomProvider([__name]) {
     _instancia._name ??= __name != null ? __name : null;
     return _instancia;
@@ -26,7 +29,6 @@ class RoomProvider with ChangeNotifier {
 
   // SocketIO _socket;
   // SocketIO get socket => _socket;
-  IO.Socket _socket = IO.io('http://localhost:5000/game');
   IO.Socket get socket => _socket;
 
   String _name;
@@ -50,6 +52,11 @@ class RoomProvider with ChangeNotifier {
   }
 
   void initializeSockets() {
+    Map<String, String> env = Platform.environment;
+    if (env.containsKey('URL_SERVER'))
+      _socket = IO.io(env['URL_SERVER'] + '/game');
+    else
+      _socket = IO.io('http://localhost:5000' + '/game');
     _socket.on('connect', (data) => print('Connected to server.'));
     _socket.on('disconnect', (data) => print('Disconnected to server.'));
     _socket.on('join', onJoinPlayer);
@@ -96,35 +103,37 @@ class RoomProvider with ChangeNotifier {
     _players = [];
 
     gameCanvas.leaveRoom();
-    
+
     notifyListeners();
   }
 
   void onHitPoint(data) {
-    
     print('onHitPoint called. ' + data.toString());
-    
+
     Map<String, dynamic> jsonData = jsonDecode(data) as Map;
-    
+
     String _sidHits = jsonData['sid'];
     int index = _players.indexWhere((p) => p['sid'] == _sidHits);
-    String hitCode = jsonData['hitCode']; 
+    String hitCode = jsonData['hitCode'];
     gameCanvas.removePoint(hitCode);
     // int _scoreSidHits = jsonData['score'];
-    
+
     _players[index]['score'] += 1;
     // _players[index]['score'] = _scoreSidHits.toString();
-    
+
     notifyListeners();
   }
 
   void onGeneratePoint(data) {
     print('onGeneratedPoint called.' + data.toString());
-    
+
     Map<String, dynamic> jsonData = jsonDecode(data) as Map;
-    gameCanvas.generatePoint( jsonData['hitCode'], Offset(jsonData['cords']['x'], jsonData['cords']['y']), onPlayerHitPoint );
+    gameCanvas.generatePoint(
+        jsonData['hitCode'],
+        Offset(jsonData['cords']['x'], jsonData['cords']['y']),
+        onPlayerHitPoint);
     // pointSocketCallback(jsonData['hitCode'], Offset(jsonData['cords']['x'], jsonData['cords']['y']));
-    
+
     notifyListeners();
   }
 
@@ -159,12 +168,9 @@ class RoomProvider with ChangeNotifier {
     _players.removeWhere((p) => p['sid'] == _sid);
     notifyListeners();
   }
-  
+
   void onPlayerHitPoint(String hitCode) {
-    
     print('Hit point called. #' + hitCode);
-    socket.emit('point', {'code':hitCode, 'room':_code});
-    
-    
+    socket.emit('point', {'code': hitCode, 'room': _code});
   }
 }
