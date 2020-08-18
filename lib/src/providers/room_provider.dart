@@ -1,20 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
+import 'package:universal_io/io.dart';
 
 import 'package:aimgame/src/game/game.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'dart:io';
 
 class RoomProvider with ChangeNotifier {
   // Keep room
   static final RoomProvider _instancia = RoomProvider._internal();
 
-  factory RoomProvider([__name]) {
-    _instancia._name ??= __name != null ? __name : null;
+  String _urlServer;
+  factory RoomProvider([String __urlServer]) {
+    // _instancia._urlServer ??= __urlServer != null ? __urlServer : null;
+    // _instancia._socket  ??= __urlServer != null ? IO.io(__urlServer): null;
     return _instancia;
   }
   RoomProvider._internal();
@@ -42,14 +43,10 @@ class RoomProvider with ChangeNotifier {
     return _players;
   }
 
-  String urlServer;
   void initializeSockets() {
     Map<String, String> env = Platform.environment;
-    print(env);
-    urlServer = env.containsKey('URL_SERVER')
-        ? env['URL_SERVER']
-        : 'http://localhost:5000/';
-    _socket = IO.io(urlServer + '/game');
+    _urlServer = env['URL_SERVER'] ?? 'http://localhost:5000';
+    _socket = IO.io(_urlServer + '/game');
 
     _socket.on('connect', (data) => print('Connected to server.'));
     _socket.on('disconnect', (data) => print('Disconnected to server.'));
@@ -63,10 +60,10 @@ class RoomProvider with ChangeNotifier {
   Future<void> create() async {
     if (inGame) throw Future.error('You are currently in game. Leave.');
 
-    String endpoint = 'create';
+    String endpoint = '/create';
     Map<String, dynamic> body = {'name': _name};
 
-    var res = await http.post(urlServer + endpoint, body: body);
+    var res = await http.post(_urlServer + endpoint, body: body);
     var jsonRes = json.decode(res.body);
 
     _code = jsonRes['code'];

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:flame/components/component.dart';
 import 'package:flame/components/mixins/tapable.dart';
-import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 
 class Point extends PositionComponent with Tapable {

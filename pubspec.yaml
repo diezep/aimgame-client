@@ -30,7 +30,8 @@ dependencies:
   # socket_io:
   http:
   provider:
-
+  universal_io:
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
