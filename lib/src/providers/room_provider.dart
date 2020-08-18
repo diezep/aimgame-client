@@ -42,10 +42,11 @@ class RoomProvider with ChangeNotifier {
     return _players;
   }
 
+  String urlServer;
   void initializeSockets() {
     Map<String, String> env = Platform.environment;
     print(env);
-    String urlServer = env.containsKey('URL_SERVER')
+    urlServer = env.containsKey('URL_SERVER')
         ? env['URL_SERVER']
         : 'http://localhost:5000/';
     _socket = IO.io(urlServer + '/game');
@@ -65,7 +66,7 @@ class RoomProvider with ChangeNotifier {
     String endpoint = 'create';
     Map<String, dynamic> body = {'name': _name};
 
-    var res = await http.post(url + endpoint, body: body);
+    var res = await http.post(urlServer + endpoint, body: body);
     var jsonRes = json.decode(res.body);
 
     _code = jsonRes['code'];
