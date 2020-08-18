@@ -2,22 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
-// import 'package:adhara_socket_io/adhara_socket_io.dart';
-// import 'package:flutter_socket_io/socket_io_manager.dart';
-import 'package:aimgame/src/game/components/point.dart';
 import 'package:aimgame/src/game/game.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-// import 'package:flutter_socket_io/flutter_socket_io.dart';
 import 'dart:io';
 
 class RoomProvider with ChangeNotifier {
   // Keep room
   static final RoomProvider _instancia = RoomProvider._internal();
-  IO.Socket _socket;
 
   factory RoomProvider([__name]) {
     _instancia._name ??= __name != null ? __name : null;
@@ -25,10 +19,7 @@ class RoomProvider with ChangeNotifier {
   }
   RoomProvider._internal();
 
-  String url = 'http://localhost:5000/';
-
-  // SocketIO _socket;
-  // SocketIO get socket => _socket;
+  IO.Socket _socket;
   IO.Socket get socket => _socket;
 
   String _name;
@@ -53,10 +44,12 @@ class RoomProvider with ChangeNotifier {
 
   void initializeSockets() {
     Map<String, String> env = Platform.environment;
-    if (env.containsKey('URL_SERVER'))
-      _socket = IO.io(env['URL_SERVER'] + '/game');
-    else
-      _socket = IO.io('http://localhost:5000' + '/game');
+    print(env);
+    String urlServer = env.containsKey('URL_SERVER')
+        ? env['URL_SERVER']
+        : 'http://localhost:5000/';
+    _socket = IO.io(urlServer + '/game');
+
     _socket.on('connect', (data) => print('Connected to server.'));
     _socket.on('disconnect', (data) => print('Disconnected to server.'));
     _socket.on('join', onJoinPlayer);
