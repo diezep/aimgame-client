@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:aimgame/main.dart';
 import 'package:aimgame/src/game/game.dart';
 import 'package:aimgame/src/providers/room_provider.dart';
@@ -8,7 +6,7 @@ import 'package:aimgame/src/widgets/leaderboard_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'dart:io';
+import 'package:universal_io/io.dart';
 
 class GamePage extends StatefulWidget {
   GamePage({Key key}) : super(key: key);
@@ -40,7 +38,11 @@ class _GamePageState extends State<GamePage> {
 
     return ChangeNotifierProvider(
       create: (context) {
-        RoomProvider room = RoomProvider();
+        
+        Map<String, String> env = Platform.environment;
+        String urlServer = env['URL_SERVER'] ?? 'http://localhost:5000';
+        print(env);
+        RoomProvider room = RoomProvider(urlServer);
         room.gameCanvas = gameCanvas;
         room.initializeSockets();
         return room;

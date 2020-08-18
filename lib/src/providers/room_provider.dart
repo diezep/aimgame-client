@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:universal_io/io.dart';
 
 import 'package:aimgame/src/game/game.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,11 +13,13 @@ class RoomProvider with ChangeNotifier {
 
   String _urlServer;
   factory RoomProvider([String __urlServer]) {
-    // _instancia._urlServer ??= __urlServer != null ? __urlServer : null;
-    // _instancia._socket  ??= __urlServer != null ? IO.io(__urlServer): null;
+    _instancia._urlServer = __urlServer ?? null;
+    _instancia._socket = IO.io(__urlServer+namespace) ?? null;
     return _instancia;
   }
   RoomProvider._internal();
+
+  static String namespace = "/game";
 
   IO.Socket _socket;
   IO.Socket get socket => _socket;
@@ -44,10 +45,6 @@ class RoomProvider with ChangeNotifier {
   }
 
   void initializeSockets() {
-    Map<String, String> env = Platform.environment;
-    _urlServer = env['URL_SERVER'] ?? 'http://localhost:5000';
-    _socket = IO.io(_urlServer + '/game');
-
     _socket.on('connect', (data) => print('Connected to server.'));
     _socket.on('disconnect', (data) => print('Disconnected to server.'));
     _socket.on('join', onJoinPlayer);
