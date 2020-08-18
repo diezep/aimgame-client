@@ -40,7 +40,7 @@ class _GamePageState extends State<GamePage> {
       create: (context) {
         
         Map<String, String> env = Platform.environment;
-        String urlServer = env['URL_SERVER'] ?? 'http://localhost:5000';
+        String urlServer = 'https://aimgame-server.herokuapp.com';
         print(env);
         RoomProvider room = RoomProvider(urlServer);
         room.gameCanvas = gameCanvas;
