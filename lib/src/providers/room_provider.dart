@@ -14,7 +14,7 @@ class RoomProvider with ChangeNotifier {
   String _urlServer;
   factory RoomProvider([String __urlServer]) {
     _instancia._urlServer = __urlServer ?? null;
-    _instancia._socket = IO.io(__urlServer+namespace) ?? null;
+    _instancia._socket = IO.io(__urlServer + namespace) ?? null;
     return _instancia;
   }
   RoomProvider._internal();
@@ -64,7 +64,6 @@ class RoomProvider with ChangeNotifier {
     var jsonRes = json.decode(res.body);
 
     _code = jsonRes['code'];
-
     this.join(_code);
   }
 
@@ -103,11 +102,9 @@ class RoomProvider with ChangeNotifier {
     String _sidHits = jsonData['sid'];
     int index = _players.indexWhere((p) => p['sid'] == _sidHits);
     String hitCode = jsonData['hitCode'];
-    gameCanvas.removePoint(hitCode);
-    // int _scoreSidHits = jsonData['score'];
 
+    gameCanvas.removePoint(hitCode);
     _players[index]['score'] += 1;
-    // _players[index]['score'] = _scoreSidHits.toString();
 
     notifyListeners();
   }
@@ -119,8 +116,7 @@ class RoomProvider with ChangeNotifier {
     gameCanvas.generatePoint(
         jsonData['hitCode'],
         Offset(jsonData['cords']['x'], jsonData['cords']['y']),
-        onPlayerHitPoint);
-    // pointSocketCallback(jsonData['hitCode'], Offset(jsonData['cords']['x'], jsonData['cords']['y']));
+        (String code) => onPlayerHitPoint(code));
 
     notifyListeners();
   }

@@ -15,8 +15,7 @@ class GameCanvas extends BaseGame with HasTapableComponents {
   static final Paint paint = Paint();
   Size screenSize;
   Timer timer;
-  void generatePoint(String code, Offset porcentageOffset,
-      void Function(String) pointCallback) async {
+  void generatePoint(String code, Offset porcentageOffset, void Function(String) pointCallback) async {
     Point newPoint = Point(code, pointCallback)
       ..x = porcentageOffset.dx * screenSize.width / 100
       ..y = porcentageOffset.dy * screenSize.height / 100;

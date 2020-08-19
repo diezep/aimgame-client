@@ -11,28 +11,23 @@ class Point extends PositionComponent with Tapable {
   static const double SPEED = 8;
   bool removed = false;
   Function(String) callbackOnTap;
-  static final Paint _white = Paint()..color = const Color(0xFFFFFFFF);
+  static final Paint _white = Paint()
+    ..color = const Color(0xFFFFFFFF);
 
   Point(String hitCode, void Function(String) callback, {double x, double y}) {
-    
     this.callbackOnTap = callback;
     this.hitCode = hitCode;
     width = height = radius;
   }
 
   @override
-  void render(Canvas c) {
-    // c.drawRect(toRect(), _white);
-
-    // c.drawRect(toRect(), _white);
-    c.drawArc(toRect(), 0.0, 360, true, _white);
-  }
+  void render(Canvas c) => c.drawArc(toRect(), 0.0, 360, true, _white);
 
   @override
   void update(double dt) {
     if (radius <= .5)
       removed = true;
-    else{
+    else {
       width = height = radius -= dt * SPEED;
       x += (dt * SPEED) / 2;
       y += (dt * SPEED) / 2;
@@ -43,29 +38,13 @@ class Point extends PositionComponent with Tapable {
 
   @override
   void onTapDown(TapDownDetails details) {
-
-    removed = true;
-    callbackOnTap(hitCode);
-
+    Function.apply(callbackOnTap, [hitCode]);
+    // removed = true;
     super.onTapDown(details);
   }
 
   @override
-  void onTapUp(TapUpDetails details) {
-    print('Tap up');
-
-    removed = true;
-    super.onTapUp(details);
-  }
-
-  @override
-  void onTapCancel() {
-    print('Tap up');
-    removed = true;
-
-    // TODO: implement onTapCancel
-    super.onTapCancel();
-  }
+  int priority() => 0;
 
   @override
   bool destroy() => removed;
